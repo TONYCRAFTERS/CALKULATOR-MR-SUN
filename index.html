@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Event Agency Calculator</title>
-    <!-- Подключаем официальный скрипт Telegram Web Apps -->
+    <title>Event Agency Calculator PRO</title>
     <script src="https://telegram.org"></script>
     <style>
         :root {
@@ -13,12 +12,12 @@
             --txt-main: #0F172A;
             --txt-muted: #64748B;
             --accent-blue: #1E40AF;
+            --accent-red: #DC2626;
             --bg-res: #F1F5F9;
             --border: #E2E8F0;
             --profit-green: #1E4620;
         }
 
-        /* Автоматическая адаптация под темную тему Telegram */
         body.tg-theme {
             --bg-main: var(--tg-theme-bg-color, #F8FAFC);
             --bg-card: var(--tg-theme-secondary-bg-color, #FFFFFF);
@@ -30,31 +29,47 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-main);
             color: var(--txt-main);
             margin: 0;
             padding: 16px;
             display: flex;
             justify-content: center;
-            -webkit-user-select: none;
-            user-select: none;
         }
 
         .container {
             width: 100%;
-            max-width: 440px;
+            max-width: 460px;
         }
 
         h2 {
             font-size: 18px;
             font-weight: 600;
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            color: var(--accent-blue);
+        }
+
+        h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 20px 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--txt-main);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 4px;
         }
 
         .input-group {
-            margin-bottom: 14px;
+            margin-bottom: 12px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
         }
 
         label {
@@ -62,22 +77,20 @@
             font-size: 11px;
             font-weight: 700;
             color: var(--txt-muted);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         input {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
+            padding: 10px;
+            font-size: 15px;
             background-color: var(--bg-card);
             color: var(--txt-main);
             border: 1px solid var(--border);
             border-radius: 8px;
             box-sizing: border-box;
             outline: none;
-            transition: border-color 0.2s;
         }
 
         input:focus {
@@ -89,14 +102,14 @@
             border: 1px solid var(--border);
             border-radius: 10px;
             padding: 16px;
-            margin-top: 24px;
+            margin-top: 20px;
         }
 
         .row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             font-size: 14px;
         }
 
@@ -111,7 +124,6 @@
         .row.profit span:last-child {
             font-size: 18px;
             font-weight: 700;
-            color: var(--profit-green);
         }
 
         .divider {
@@ -119,31 +131,87 @@
             background-color: var(--border);
             margin: 8px 0;
         }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            box-sizing: border-box;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--accent-red);
+            border: 1px solid var(--accent-red);
+            margin-top: 15px;
+        }
+
+        /* Стили для печати/PDF */
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .btn, h2, .btn-secondary { display: none !important; }
+            input { border: none; padding: 0; background: transparent; font-size: 14px; }
+            .results-box { background: transparent; border: 1px solid #000; }
+        }
     </style>
 </head>
 <body class="tg-theme">
 
 <div class="container">
-    <h2>Расчет маржинальности проекта</h2>
+    <h2>Event Agency Budget Intelligence PRO</h2>
     
+    <h3>1. Основные параметры</h3>
     <div class="input-group">
         <label>Цена за человека в час (₽)</label>
-        <input type="number" id="price" value="1500" inputmode="numeric" oninput="calculate()">
+        <input type="number" id="price" value="1500" oninput="calculate()">
     </div>
-    
-    <div class="input-group">
-        <label>Продолжительность (часов)</label>
-        <input type="number" id="hours" value="3" inputmode="numeric" oninput="calculate()">
+    <div class="grid-2">
+        <div class="input-group">
+            <label>Продолжительность (ч)</label>
+            <input type="number" id="hours" value="3" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Количество участников</label>
+            <input type="number" id="guests" value="20" oninput="calculate()">
+        </div>
     </div>
-    
     <div class="input-group">
-        <label>Количество участников</label>
-        <input type="number" id="guests" value="20" inputmode="numeric" oninput="calculate()">
+        <label>Прямые расходы на декор/костюмы (₽)</label>
+        <input type="number" id="costs" value="6500" oninput="calculate()">
     </div>
-    
-    <div class="input-group">
-        <label>Прямые расходы на проект (₽)</label>
-        <input type="number" id="costs" value="6500" inputmode="numeric" oninput="calculate()">
+
+    <h3>2. Гонорары команды (Подрядчики)</h3>
+    <div class="grid-2">
+        <div class="input-group">
+            <label>Ведущий (₽)</label>
+            <input type="number" id="pay_host" value="15000" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Диджей (₽)</label>
+            <input type="number" id="pay_dj" value="8000" oninput="calculate()">
+        </div>
+    </div>
+    <div class="grid-2">
+        <div class="input-group">
+            <label>Координатор (₽)</label>
+            <input type="number" id="pay_coord" value="5000" oninput="calculate()">
+        </div>
+        <div class="input-group">
+            <label>Аниматоры / Артисты (₽)</label>
+            <input type="number" id="pay_actors" value="5000" oninput="calculate()">
+        </div>
     </div>
 
     <div class="results-box">
@@ -151,22 +219,35 @@
             <span style="color: var(--txt-muted);">Итоговая выручка</span>
             <span id="revenue" class="bold">90 000 ₽</span>
         </div>
+        <div class="row">
+            <span style="color: var(--txt-muted);">Фонд зарплат подрядчиков</span>
+            <span id="total_team" class="bold">33 000 ₽</span>
+        </div>
+        <div class="row">
+            <span style="color: var(--txt-muted);">Всего расходов (с реквизитом)</span>
+            <span id="total_expenses" class="bold">39 500 ₽</span>
+        </div>
+        <div class="divider"></div>
         <div class="row bold profit">
-            <span>Чистая прибыль</span>
-            <span id="profit">83 500 ₽</span>
+            <span>Чистая прибыль агентства</span>
+            <span id="profit">50 500 ₽</span>
         </div>
         <div class="divider"></div>
         <div class="row">
-            <span style="color: var(--txt-muted);">Рентабельность (ROI)</span>
-            <span id="margin" class="bold">92.8%</span>
+            <span style="color: var(--txt-muted);">Рентабельность проекта (ROI)</span>
+            <span id="margin" class="bold">56.1%</span>
         </div>
     </div>
+
+    <button class="btn btn-primary" onclick="saveAsPDF()">Сохранить смету в PDF</button>
+    <button class="btn btn-secondary" onclick="resetFields()">Сбросить все поля</button>
 </div>
 
 <script>
-    // Сообщаем Telegram, что приложение готово к отрисовке
-    window.Telegram.WebApp.ready();
-    window.Telegram.WebApp.expand(); // Разворачиваем на максимум
+    if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+    }
 
     function calculate() {
         const price = parseFloat(document.getElementById('price').value) || 0;
@@ -174,22 +255,40 @@
         const guests = parseFloat(document.getElementById('guests').value) || 0;
         const costs = parseFloat(document.getElementById('costs').value) || 0;
 
-        const perPerson = price * hours;
-        const revenue = perPerson * guests;
-        const profit = revenue - costs;
+        // Подрядчики
+        const host = parseFloat(document.getElementById('pay_host').value) || 0;
+        const dj = parseFloat(document.getElementById('pay_dj').value) || 0;
+        const coord = parseFloat(document.getElementById('pay_coord').value) || 0;
+        const actors = parseFloat(document.getElementById('pay_actors').value) || 0;
+
+        const revenue = price * hours * guests;
+        const totalTeam = host + dj + coord + actors;
+        const totalExpenses = costs + totalTeam;
+        const profit = revenue - totalExpenses;
         const margin = revenue > 0 ? ((profit / revenue) * 100).toFixed(1) : 0;
 
         document.getElementById('revenue').innerText = revenue.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('total_team').innerText = totalTeam.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('total_expenses').innerText = totalExpenses.toLocaleString('ru-RU') + ' ₽';
         document.getElementById('profit').innerText = profit.toLocaleString('ru-RU') + ' ₽';
         document.getElementById('margin').innerText = margin + '%';
 
-        // Динамический цвет чистой прибыли
         const profitSpan = document.getElementById('profit');
         if (profit >= 0) {
             profitSpan.style.color = '#1E4620';
         } else {
             profitSpan.style.color = '#C62828';
         }
+    }
+
+    function resetFields() {
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => input.value = '');
+        calculate();
+    }
+
+    function saveAsPDF() {
+        window.print();
     }
 
     calculate();
