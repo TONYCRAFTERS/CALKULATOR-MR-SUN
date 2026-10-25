@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Event Agency Calculator</title>
+    <!-- Подключаем официальный скрипт Telegram Web Apps -->
+    <script src="https://telegram.org"></script>
+    <style>
+        :root {
+            --bg-main: #F8FAFC;
+            --bg-card: #FFFFFF;
+            --txt-main: #0F172A;
+            --txt-muted: #64748B;
+            --accent-blue: #1E40AF;
+            --bg-res: #F1F5F9;
+            --border: #E2E8F0;
+            --profit-green: #1E4620;
+        }
+
+        /* Автоматическая адаптация под темную тему Telegram */
+        body.tg-theme {
+            --bg-main: var(--tg-theme-bg-color, #F8FAFC);
+            --bg-card: var(--tg-theme-secondary-bg-color, #FFFFFF);
+            --txt-main: var(--tg-theme-text-color, #0F172A);
+            --txt-muted: var(--tg-theme-hint-color, #64748B);
+            --accent-blue: var(--tg-theme-button-color, #1E40AF);
+            --bg-res: var(--tg-theme-secondary-bg-color, #F1F5F9);
+            --border: rgba(128, 128, 128, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--txt-main);
+            margin: 0;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 14px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--txt-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: var(--bg-card);
+            color: var(--txt-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .results-box {
+            background-color: var(--bg-res);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 24px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .row:last-child {
+            margin-bottom: 0;
+        }
+
+        .row.bold {
+            font-weight: 600;
+        }
+
+        .row.profit span:last-child {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--profit-green);
+        }
+
+        .divider {
+            height: 1px;
+            background-color: var(--border);
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body class="tg-theme">
+
+<div class="container">
+    <h2>Расчет маржинальности проекта</h2>
+    
+    <div class="input-group">
+        <label>Цена за человека в час (₽)</label>
+        <input type="number" id="price" value="1500" inputmode="numeric" oninput="calculate()">
+    </div>
+    
+    <div class="input-group">
+        <label>Продолжительность (часов)</label>
+        <input type="number" id="hours" value="3" inputmode="numeric" oninput="calculate()">
+    </div>
+    
+    <div class="input-group">
+        <label>Количество участников</label>
+        <input type="number" id="guests" value="20" inputmode="numeric" oninput="calculate()">
+    </div>
+    
+    <div class="input-group">
+        <label>Прямые расходы на проект (₽)</label>
+        <input type="number" id="costs" value="6500" inputmode="numeric" oninput="calculate()">
+    </div>
+
+    <div class="results-box">
+        <div class="row">
+            <span style="color: var(--txt-muted);">Итоговая выручка</span>
+            <span id="revenue" class="bold">90 000 ₽</span>
+        </div>
+        <div class="row bold profit">
+            <span>Чистая прибыль</span>
+            <span id="profit">83 500 ₽</span>
+        </div>
+        <div class="divider"></div>
+        <div class="row">
+            <span style="color: var(--txt-muted);">Рентабельность (ROI)</span>
+            <span id="margin" class="bold">92.8%</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Сообщаем Telegram, что приложение готово к отрисовке
+    window.Telegram.WebApp.ready();
+    window.Telegram.WebApp.expand(); // Разворачиваем на максимум
+
+    function calculate() {
+        const price = parseFloat(document.getElementById('price').value) || 0;
+        const hours = parseFloat(document.getElementById('hours').value) || 0;
+        const guests = parseFloat(document.getElementById('guests').value) || 0;
+        const costs = parseFloat(document.getElementById('costs').value) || 0;
+
+        const perPerson = price * hours;
+        const revenue = perPerson * guests;
+        const profit = revenue - costs;
+        const margin = revenue > 0 ? ((profit / revenue) * 100).toFixed(1) : 0;
+
+        document.getElementById('revenue').innerText = revenue.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('profit').innerText = profit.toLocaleString('ru-RU') + ' ₽';
+        document.getElementById('margin').innerText = margin + '%';
+
+        // Динамический цвет чистой прибыли
+        const profitSpan = document.getElementById('profit');
+        if (profit >= 0) {
+            profitSpan.style.color = '#1E4620';
+        } else {
+            profitSpan.style.color = '#C62828';
+        }
+    }
+
+    calculate();
+</script>
+</body>
+</html>
